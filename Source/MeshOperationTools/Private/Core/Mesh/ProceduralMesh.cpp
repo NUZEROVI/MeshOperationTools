@@ -20,8 +20,12 @@ AProceduralMesh::AProceduralMesh()
 	RootComponent->SetWorldScale3D(FVector(1.f));
 
 	// For 01_PlaneMesh Demo Material
-	static ConstructorHelpers::FObjectFinder<UStaticMesh> StaticMesh(TEXT("/Game/DefaultResources/PlaneMesh.PlaneMesh"));
-	UMaterial* Material = LoadObject<UMaterial>(NULL, TEXT("/Engine/BasicShapes/BasicShapeMaterial.BasicShapeMaterial"), NULL, LOAD_None, NULL);
+	// static ConstructorHelpers::FObjectFinder<UStaticMesh> StaticMesh(TEXT("/Game/DefaultResources/PlaneMesh.PlaneMesh"));
+	// UMaterial* Material = LoadObject<UMaterial>(NULL, TEXT("/Engine/BasicShapes/BasicShapeMaterial.BasicShapeMaterial"), NULL, LOAD_None, NULL);
+
+	// For 02_HeartMesh Demo (FBX 3D Model)
+	static ConstructorHelpers::FObjectFinder<UStaticMesh> StaticMesh(TEXT("/Game/DefaultResources/Heart.Heart"));
+	UMaterial* Material = LoadObject<UMaterial>(NULL, TEXT("/Game/DefaultResources/Heart_Material.Heart_Material"), NULL, LOAD_None, NULL);
 
 	// Create Procedural Mesh and Attach to Root
 	ProceduralMesh = CreateDefaultSubobject<UProceduralMeshComponent>(TEXT("GeneratedMesh"));

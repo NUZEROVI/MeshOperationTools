@@ -22,8 +22,8 @@ AOperationTools::AOperationTools()
 	// Set Root Component
 	CollisionCylinder = GetCapsuleComponent();
 	SetRootComponent(CollisionCylinder);
-	CollisionCylinder->InitCapsuleSize(40.f, 108.f);
-	CollisionCylinder->SetWorldScale3D(FVector(1.f));
+	CollisionCylinder->InitCapsuleSize(40.f, 117.f);
+	CollisionCylinder->SetWorldScale3D(FVector(0.5f));
 
 	// Default Settings for inheriting controller rotations
 	bUseControllerRotationPitch = false;
