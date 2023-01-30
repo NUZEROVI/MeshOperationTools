@@ -7,6 +7,7 @@
 
 #include "Core/Player/OperationTools.h"
 #include "Camera/CameraComponent.h"
+#include "Kismet/GameplayStatics.h"
 #include "Components/CapsuleComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 
@@ -53,6 +54,27 @@ void AOperationTools::BeginPlay()
 {
 	Super::BeginPlay();
 	
+	// Create ProceduralMesh (Constructor -> PostInitialize -> BeginPlay)
+	UWorld* const World = GetWorld();
+	if(World)
+	{
+		ProceduralMesh = GetWorld()->SpawnActor<AProceduralMesh>(AProceduralMesh::StaticClass(), FVector(0), FRotator(0), FActorSpawnParameters());
+	}
+	
+	TArray<AActor*> Actors;
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), AActor::StaticClass(), Actors);
+	if(ProceduralMesh == nullptr)
+	{
+		for (AActor* Actor : Actors)
+		{
+			ProceduralMesh = Cast<AProceduralMesh>(Actor);
+			if(ProceduralMesh)
+			{
+				//UE_LOG(LogTemp, Log, TEXT("Cast Actor: %s"), *ProceduralMesh->GetName());
+				break;
+			}
+		}
+	}	
 }
 
 void AOperationTools::Tick(float DeltaTime)

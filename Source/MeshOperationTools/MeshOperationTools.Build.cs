@@ -15,6 +15,7 @@ public class MeshOperationTools : ModuleRules
 			"Engine", 
 			"InputCore",
 			"Slate",
+			"ProceduralMeshComponent",
 		});
 
 		PrivateDependencyModuleNames.AddRange(new string[] {  });

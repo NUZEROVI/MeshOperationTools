@@ -8,6 +8,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Core/Mesh/ProceduralMesh.h"
 #include "GameFramework/Character.h"
 #include "OperationTools.generated.h"
 
@@ -30,13 +31,13 @@ public:
 
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
-	// Operation Methods
+	/* Operation Methods */
 	void ForcepsToolOn(); // Grasping Mesh (Left-Click On)
 	void ForcepsToolOff(); // Grasping Mesh (Left-Click Off)
 	void ScalpelTool(); // Cutting Mesh
 	
 protected:
-	// Player Attributes
+	/* Player Attributes */
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Root Component")
     class UCapsuleComponent* CollisionCylinder;
 
@@ -51,4 +52,8 @@ protected:
     
     UPROPERTY(Category = "Movement Variables", BlueprintReadOnly)
     float DefaultCameraArmLength;
+
+	/* Mesh Attributes */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "ProceduralMesh")
+	class AProceduralMesh* ProceduralMesh;
 };
