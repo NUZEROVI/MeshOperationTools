@@ -12,6 +12,8 @@
 #include "ProceduralMeshComponent.h"
 #include "ProceduralMesh.generated.h"
 
+class UPrimitiveMeshComponent;
+
 UCLASS()
 class MESHOPERATIONTOOLS_API AProceduralMesh : public AActor
 {
@@ -48,4 +50,7 @@ private:
 	// Attributes
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 	UProceduralMeshComponent* ProceduralMesh;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+	UPrimitiveMeshComponent* PrimitiveMeshComponent;
 };

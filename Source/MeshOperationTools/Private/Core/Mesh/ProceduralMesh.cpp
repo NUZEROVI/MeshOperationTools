@@ -7,6 +7,9 @@
 
 #include "Core/Mesh/ProceduralMesh.h"
 
+#include "Core/MeshComponent/MeshEdge.h"
+#include "Core/MeshComponent/PrimitiveMeshComponent.h"
+
 // Constructor -> PostInitialize -> BeginPlay
 AProceduralMesh::AProceduralMesh()
 {
@@ -28,7 +31,8 @@ AProceduralMesh::AProceduralMesh()
 	Mesh = StaticMesh.Object;
 	ProceduralMesh->bUseAsyncCooking = true;
 	ProceduralMesh->SetupAttachment(RootComponent);
-
+	
+	PrimitiveMeshComponent = CreateDefaultSubobject<UPrimitiveMeshComponent>(TEXT("MeshComponent"));
 }
 
 void AProceduralMesh::BeginPlay()
@@ -71,7 +75,16 @@ void AProceduralMesh::LoadMeshVertices()
 	{
 		// Original Mesh Vertices
 		Vertices[i] = Resource.VertexBuffers.PositionVertexBuffer.VertexPosition(i);
+
+		// Initialized UMeshVertex
+		PrimitiveMeshComponent->InitializedVertices(this, i , Vertices[i], Vertices[i], FVector2D(Vertices[i].X, Vertices[i].Y));
 	}
+	
+	// Initialized UMeshTriangle and MeshEdges InitializedTriangle()
+	for(int i = 0; i < Indices.Num(); i += 3) { PrimitiveMeshComponent->InitializedTriangle(Indices[i], Indices[i + 1], Indices[i + 2]);	}
+	
+	// Set OriginalEdge
+	for (TTuple<int32, int32, int32, UMeshEdge*> Edge : PrimitiveMeshComponent->GetEdges()) { Edge.Get<3>()->OriginalEdge = true; }
 
 	ProceduralMesh->CreateMeshSection_LinearColor(
 		0,
