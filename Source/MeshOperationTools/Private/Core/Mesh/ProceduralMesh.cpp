@@ -99,3 +99,25 @@ void AProceduralMesh::LoadMeshVertices()
 	ProceduralMesh->ContainsPhysicsTriMeshData(true);
 }
 
+void AProceduralMesh::UpdateNewMeshArrays(TArray<FVector> NewMeshVertices, TArray<FVector2D> NewMeshUVs, TArray<int> NewMeshTriangles)
+{
+	NewVertices = NewMeshVertices;
+	NewIndices = NewMeshTriangles;
+	
+	TArray<FVector> NewNormals;
+	TArray<FVector> Normals;
+	TArray<FLinearColor> VertexColors;
+
+	VertexColors.AddUninitialized(NewVertices.Num());
+	for (int i = 0; i < NewIndices.Num(); i += 3)
+	{
+		VertexColors[NewIndices[i]] = FLinearColor::Gray;
+		VertexColors[NewIndices[i + 1]] = FLinearColor::Gray;
+		VertexColors[NewIndices[i + 2]] = FLinearColor::Gray;
+		NewNormals.Add(FVector::CrossProduct(NewVertices[NewIndices[i + 2]] - NewVertices[NewIndices[i]], NewVertices[NewIndices[i + 1]] - NewVertices[NewIndices[i]]).GetSafeNormal());
+	}
+	
+	ProceduralMesh->ClearMeshSection(0);
+	ProceduralMesh->CreateMeshSection_LinearColor(0, NewVertices, NewIndices, NewNormals, NewMeshUVs, VertexColors, TArray<FProcMeshTangent>(), true);
+	ProceduralMesh->ContainsPhysicsTriMeshData(true);
+}

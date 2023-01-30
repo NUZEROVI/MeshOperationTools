@@ -40,6 +40,24 @@ TArray<UMeshEdge*> UMeshTriangle::GetEdge()
 	return Edges;
 }
 
+void UMeshTriangle::ShuffleVertexIndices(const int& V0Index, const int& V1Index)
+{
+	if(Vertex1Index == V0Index && Vertex2Index == V1Index)
+	{
+		int32 Temp = Vertex1Index;
+		Vertex1Index = Vertex2Index;
+		Vertex2Index  = Vertex0Index;
+		Vertex0Index = Temp; 
+	}
+	else if (Vertex0Index == V0Index && Vertex2Index == V1Index)
+	{
+		int32 Temp = Vertex2Index;
+		Vertex2Index = Vertex1Index;
+		Vertex1Index  = Vertex0Index;
+		Vertex0Index = Temp; 
+	};
+}
+
 void UMeshTriangle::Dispose()
 {
 	if(_IsDisposed == false)

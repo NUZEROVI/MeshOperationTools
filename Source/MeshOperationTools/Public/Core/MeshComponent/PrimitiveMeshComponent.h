@@ -54,7 +54,9 @@ public:
 	FORCEINLINE TArray<UMeshTriangle*> GetTriangles() const { return _Triangles; }
 	
 	FORCEINLINE TArray<TTuple<int32, int32, int32, UMeshEdge*>> GetEdges() const { return _Edges; }
-
+	
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Mesh Getters")
+	FORCEINLINE bool RemoveTriangle(UMeshTriangle* MeshTriangle) { return (_Triangles.Remove(MeshTriangle) == 1) ? true : false; }
 
 	/* Setters */
 	UFUNCTION(BlueprintCallable, Category = "Mesh Setters")
@@ -64,6 +66,28 @@ public:
 	void SetTriangle(UMeshTriangle* MeshTriangle) { _Triangles.Add(MeshTriangle); }
 
 	void SetEdges(TTuple<int32, int32, int32, UMeshEdge*> Edge) { _Edges.Add(Edge); }
+
+	/* To Catch information about the clicked Mesh */
+	UFUNCTION(BlueprintCallable, Category = "RuntimeMesh Methods")
+	UMeshVertex* GetClosestVertexToLineSegment(FVector P, FVector Q, float SnapDist);
+	
+	UFUNCTION(BlueprintCallable, Category = "RuntimeMesh Methods")
+	UMeshTriangle* GetClosestTriangleToLineSegment(FVector P, FVector Q, FVector& ClosestPoint, float& Dist, float& U, float& V);
+	
+	UFUNCTION(BlueprintCallable, Category = "RuntimeMesh Methods")
+	UMeshVertex* GetVertexOnClosestEdge(UMeshTriangle* ClosestTri, FVector ClosestPoint, float SnapDist);
+	
+	UFUNCTION(BlueprintCallable, Category = "RuntimeMesh Methods")
+	UMeshVertex* CreateVertexOnEdge(UMeshVertex* V0, UMeshVertex* V1, float T);
+	
+	UFUNCTION(BlueprintCallable, Category = "RuntimeMesh Methods")
+	UMeshVertex* CreateVertexInTriangle(UMeshTriangle* MeshTri, float U, float V);
+
+	// To Set Runtime Mesh return value
+	int _DragVertexIndex = -1; 
+	bool _IsOriVertices = false;
+	int GetDragVertexIndex(){ return _DragVertexIndex; }
+	bool GetIsOriVertices() { return _IsOriVertices; }
 	
 // Attributes
 private:
@@ -82,6 +106,16 @@ private:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 	TArray<UMeshTriangle*> _Triangles;
 	TArray<TTuple<int32, int32, int32, UMeshEdge*>> _Edges;
+
+	/* Methods */
+	void RemoveMeshTriangle(UMeshTriangle* MeshTri);
+	void RemoveTriangleFromEdge(int32 V0, int32 V1, UMeshTriangle* MeshTri);
+	
+	UMeshTriangle* CreateNewTriangle(int32 V0Index, int32 V1Index, int32 V2Index);
+	void AddTriangleToEdge(UProcedureMeshVertexPair* MeshVertexPair, UMeshTriangle* MeshTriangle);
+	void RemoveUnusedEdges();
 };
+
+
 
 

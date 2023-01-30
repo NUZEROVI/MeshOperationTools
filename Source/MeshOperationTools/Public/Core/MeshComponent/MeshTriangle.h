@@ -47,6 +47,7 @@ public:
 	
 	/* Setters */
 	FORCEINLINE void SetMeshComponent(UPrimitiveMeshComponent* MeshComponent) { PrimitiveMeshComponent = MeshComponent; }
+	void ShuffleVertexIndices(const int& V0Index, const int& V1Index);
 	void Dispose();
 
 private:

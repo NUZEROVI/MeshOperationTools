@@ -9,7 +9,9 @@
 #include "Camera/CameraComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "Components/CapsuleComponent.h"
+#include "Core/MeshComponent/MeshTriangle.h"
 #include "GameFramework/SpringArmComponent.h"
+#include "Kismet/KismetMathLibrary.h"
 
 AOperationTools::AOperationTools()
 {
@@ -59,6 +61,7 @@ void AOperationTools::BeginPlay()
 	if(World)
 	{
 		ProceduralMesh = GetWorld()->SpawnActor<AProceduralMesh>(AProceduralMesh::StaticClass(), FVector(0), FRotator(0), FActorSpawnParameters());
+		PrimitiveMeshComponent = ProceduralMesh->GetPrimitiveMeshComponent();
 	}
 	
 	TArray<AActor*> Actors;
@@ -88,6 +91,89 @@ void AOperationTools::Tick(float DeltaTime)
 		PlayerController->bEnableClickEvents = true; 
 		PlayerController->bEnableMouseOverEvents = true;
 	}
+
+	int32 ScaleX, ScaleY;
+	FVector2D TickCursor, NewCursorPos;
+	PlayerController->GetViewportSize(ScaleX, ScaleY);
+	PlayerController->GetMousePosition(TickCursor.X, TickCursor.Y);
+
+	if(CursorPos.X != -1000.0f && CursorPos.Y != -1000.f)
+	{
+		if(TickCursor.X != OriCursorPos.X && TickCursor.Y != OriCursorPos.Y)
+		{
+			IsMove = true;
+		}
+	}
+	
+	NewCursorPos.X = ((TickCursor.X / ScaleX) - 0.5f) * 2;
+	NewCursorPos.Y = ((TickCursor.Y / ScaleY) - 0.5f) * 2;
+	
+	TArray<FVector> Vertices;
+	TArray<FVector2D> UVs;
+	TArray<int> Triangles;
+
+	if(IsDrag)
+	{
+		if(!DragVertex->IsNull)
+		{
+			if(DraggingHeight < MaxHeight)
+			{
+				DraggingHeight = FMath::Min(MaxHeight, DraggingHeight + DeltaTime * MaxHeight);
+			}
+			
+			FVector NewPosition = FVector(-NewCursorPos.Y, NewCursorPos.X,  (OriginalVertexHeight + DraggingHeight)); 
+			
+			FVector VertexForce = FVector(0);
+			VertexForce.Normalize();
+			FVector NewForce = NewPosition - DragVertex->CurrentPosition;
+	
+			float NewForceProjectedMagnitude = FVector::DotProduct(NewForce, VertexForce);
+	
+			if(NewForceProjectedMagnitude < 0.0f)
+			{
+				float Multiplier = FMath::Clamp(0.5f - 0.33f * UKismetMathLibrary::Atan(VertexForce.Size() - MaximumPullForce), 0.0f , 1.0f);
+				NewPosition = DragVertex->CurrentPosition + NewForce * Multiplier;
+			}
+	
+			TArray<int32> NewTriangles;
+			if(Vertices.Num() == 0 || Vertices.Num() < PrimitiveMeshComponent->GetVertices().Num())
+			{
+				Vertices.Init(FVector(), PrimitiveMeshComponent->GetVertices().Num());
+			}
+			if(UVs.Num() == 0 || UVs.Num() < PrimitiveMeshComponent->GetVertices().Num())
+			{
+				UVs.Init(FVector2D(), PrimitiveMeshComponent->GetVertices().Num());
+			}
+			
+			for(int i = 0; i < PrimitiveMeshComponent->GetVertices().Num(); ++i)
+			{
+				if(PrimitiveMeshComponent->GetVertices()[i]->IsNull) continue;
+				if(i == PrimitiveMeshComponent->GetDragVertexIndex() && (PrimitiveMeshComponent->GetIsOriVertices() == false || IsMove == true)) // Drag Vertex
+				{
+					Vertices[i] = NewPosition;
+					PrimitiveMeshComponent->GetVertices()[i]->CurrentPosition = Vertices[i]; 
+					
+				}else
+				{
+					Vertices[i] = PrimitiveMeshComponent->GetVertices()[i]->CurrentPosition; 
+				}
+				
+				UVs[i] = PrimitiveMeshComponent->GetVertices()[i]->UVs;
+				NewTriangles.Add(PrimitiveMeshComponent->GetVertices()[i]->VertexIndex);
+			}
+	
+			Triangles.Init(int32(), PrimitiveMeshComponent->GetTriangles().Num() * 3);
+			for(int j = 0; j < PrimitiveMeshComponent->GetTriangles().Num(); ++j)
+			{
+				Triangles[3 * j + 0] = PrimitiveMeshComponent->GetTriangles()[j]->Vertex0Index;;
+				Triangles[3 * j + 1] = PrimitiveMeshComponent->GetTriangles()[j]->Vertex1Index;
+				Triangles[3 * j + 2] = PrimitiveMeshComponent->GetTriangles()[j]->Vertex2Index;
+			}
+			
+			ProceduralMesh->UpdateNewMeshArrays(Vertices, UVs, Triangles);
+		
+		}
+	}
 }
 
 void AOperationTools::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -100,10 +186,66 @@ void AOperationTools::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
 
 void AOperationTools::ForcepsToolOn()
 {
+	APlayerController* PlayerController = Cast<APlayerController>(GetController());
+
+	if(PlayerController)
+	{
+		ULocalPlayer* LocalPlayer = PlayerController->GetLocalPlayer();
+		if(LocalPlayer && LocalPlayer->ViewportClient)
+		{
+			if(PlayerController->DeprojectMousePositionToWorld(Pos, Dir))
+			{
+				FVector StartLocation = Pos;
+				FVector EndLocation = StartLocation + (Dir * 10000);
+		 		
+				UE_LOG(LogTemp, Log, TEXT("Pos location: %s"), *Pos.ToString());
+		 	
+				FHitResult HitResult(ForceInit);
+				FCollisionQueryParams QueryParams;
+				QueryParams.AddIgnoredActor(this);
+		 		
+				GetWorld()->LineTraceSingleByChannel(HitResult, StartLocation, EndLocation, ECC_Visibility, QueryParams);
+				if(Cast<AActor>(HitResult.GetActor()))
+				{
+					if(HitResult.GetActor()->GetName() == ProceduralMesh->GetName())
+					{
+						int32 ScaleX, ScaleY;
+						PlayerController->GetViewportSize(ScaleX, ScaleY);
+						PlayerController->GetMousePosition(CursorPos.X, CursorPos.Y);
+						OriCursorPos = FVector2D(CursorPos.X, CursorPos.Y);
+						IsClick = true;
+						IsDrag = true;
+						DragVertex = NewObject<UMeshVertex>();
+						if(DragVertex->IsNull)
+						{
+							DragVertex = PrimitiveMeshComponent->GetClosestVertexToLineSegment(StartLocation, EndLocation, SnapDistance);
+
+							if(!DragVertex->IsNull)
+							{
+								OriginalVertexHeight = DragVertex->CurrentPosition.Z;
+							}
+							DraggingHeight = 0.0f;
+						}
+					}else
+					{
+						DragVertex = NewObject<UMeshVertex>();
+					}
+		 	
+		 		
+		 			
+				}
+			}
+		}
+	}
 }
 
 void AOperationTools::ForcepsToolOff()
 {
+	CursorPos = FVector2D(-1000.0f, -1000.0f);
+	IsClick = false;
+	IsMove = false;
+	IsDrag = false;
+	DragVertex = NewObject<UMeshVertex>();
 }
 
 void AOperationTools::ScalpelTool()

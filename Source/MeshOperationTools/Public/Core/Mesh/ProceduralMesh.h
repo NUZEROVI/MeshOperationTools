@@ -46,6 +46,19 @@ public:
 	/* Initialization */
 	void LoadMeshVertices();
 
+	/* Getters */
+	UPrimitiveMeshComponent* GetPrimitiveMeshComponent() { return PrimitiveMeshComponent; }
+
+	/* Mesh Updated */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="MeshUpdated")  
+	TArray<FVector> NewVertices;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="MeshUpdated") 
+	TArray<int> NewIndices;
+	
+	void UpdateNewMeshArrays(TArray<FVector> NewMeshVertices, TArray<FVector2D> NewMeshUVs, TArray<int> NewMeshTriangles);
+
+
 private:
 	// Attributes
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
