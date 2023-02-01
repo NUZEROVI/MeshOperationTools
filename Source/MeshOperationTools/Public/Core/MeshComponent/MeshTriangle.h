@@ -40,7 +40,7 @@ public:
 	void Initializer(const int& V0Index, const int& V1Index, const int& V2Index);
 	
 	/* Getters */
-	TArray<UMeshEdge*> GetEdge();
+	TArray<UMeshEdge*> GetEdgeFromTriangle();
 	
 	/* Setters */
 	void ShuffleVertexIndices(const int& V0Index, const int& V1Index);

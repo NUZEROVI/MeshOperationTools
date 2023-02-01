@@ -70,6 +70,9 @@ public:
 	
 	UFUNCTION(BlueprintCallable, Category = "Mesh Setters")
 	void SetTriangle(UMeshTriangle* MeshTriangle) { _Triangles.Add(MeshTriangle); }
+	
+	UFUNCTION(BlueprintCallable, Category = "Mesh Setters")
+	void RemoveTriangle(UMeshTriangle* MeshTriangle) { _Triangles.Remove(MeshTriangle); }
 
 	void SetEdges(TTuple<int32, int32, int32, UMeshEdge*> Edge) { _Edges.Add(Edge); }
 

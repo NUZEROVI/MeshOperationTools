@@ -41,11 +41,8 @@ public:
 	void Initializer(const int& Index, const FVector& CurrPos, const FVector& OriPos, const FVector2D& MeshUVs);
 
 	/* Getters */
-	TArray<UMeshEdge*> GetEdge();
-	
-	/* Setters */
-	FORCEINLINE void RemoveTriangle(UMeshTriangle* MeshTriangle) { _Triangles.Remove(MeshTriangle); }
-	
+	TArray<UMeshEdge*> GetEdgeFromTriangle();
+
 private:
 	/* Attributes */
 	TArray<UMeshTriangle*> _Triangles;

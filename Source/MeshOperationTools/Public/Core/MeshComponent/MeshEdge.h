@@ -46,7 +46,6 @@ public:
 	
 	/* Setters */
 	FORCEINLINE void SetOriEdge(bool OriEdge) { OriginalEdge = OriEdge; }
-	FORCEINLINE void RemoveTriangle(UMeshTriangle* MeshTriangle) { _Triangles.Remove(MeshTriangle); }
 	void Dispose();
 	
 private:

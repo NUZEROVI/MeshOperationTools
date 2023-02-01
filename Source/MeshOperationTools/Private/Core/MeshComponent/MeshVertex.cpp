@@ -24,13 +24,13 @@ void UMeshVertex::Initializer(const int& Index, const FVector& CurrPos, const FV
 	IsNull = false;
 }
 
-TArray<UMeshEdge*> UMeshVertex::GetEdge()
+TArray<UMeshEdge*> UMeshVertex::GetEdgeFromTriangle()
 {
 	TArray<UMeshEdge*> Edges;
 		
 	for (UMeshTriangle* MeshTriangle : GetTriangles())
 	{
-		for (UMeshEdge* MeshEdge : MeshTriangle->GetEdge())
+		for (UMeshEdge* MeshEdge : MeshTriangle->GetEdgeFromTriangle())
 		{
 			if(MeshEdge->Vertex0Index == VertexIndex || MeshEdge->Vertex1Index == VertexIndex)
 			{

@@ -20,7 +20,7 @@ void UMeshTriangle::Initializer(const int& V0Index, const int& V1Index, const in
 	IsNull = false;
 }
 
-TArray<UMeshEdge*> UMeshTriangle::GetEdge()
+TArray<UMeshEdge*> UMeshTriangle::GetEdgeFromTriangle()
 {
 	TArray<UMeshEdge*> Edges;
 	UMeshEdge* Edges0;
