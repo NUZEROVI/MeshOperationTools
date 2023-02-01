@@ -7,12 +7,12 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Components/ActorComponent.h"
+#include "PrimitiveMeshComponent.h"
 #include "ProcedureMeshVertexPair.generated.h"
 
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
-class MESHOPERATIONTOOLS_API UProcedureMeshVertexPair : public UActorComponent
+class MESHOPERATIONTOOLS_API UProcedureMeshVertexPair : public UPrimitiveMeshComponent
 {
 	GENERATED_BODY()
 

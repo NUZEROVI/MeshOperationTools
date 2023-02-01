@@ -14,15 +14,7 @@
 UPrimitiveMeshComponent::UPrimitiveMeshComponent()
 {
 	PrimaryComponentTick.bCanEverTick = true;
-
-	PrimitiveMeshVertex = CreateDefaultSubobject<UMeshVertex>(TEXT("PrimitiveMeshVertex"));
-	PrimitiveMeshVertex->SetMeshComponent(this);
 	
-	PrimitiveMeshTriangle = CreateDefaultSubobject<UMeshTriangle>(TEXT("PrimitiveMeshTriangle"));
-	PrimitiveMeshTriangle->SetMeshComponent(this);
-	
-	PrimitiveMeshEdge = CreateDefaultSubobject<UMeshEdge>(TEXT("PrimitiveMeshEdge"));
-	PrimitiveMeshEdge->SetMeshComponent(this);
 }
 
 void UPrimitiveMeshComponent::BeginPlay()
@@ -41,7 +33,7 @@ void UPrimitiveMeshComponent::InitializedVertices(AProceduralMesh* Mesh, const i
 {
 	_Mesh = Mesh;
 	UMeshVertex* MeshVertex = NewObject<UMeshVertex>();
-	MeshVertex->Initializer(Mesh, Index , CurrPos, OriPos, FVector2D(CurrPos.X, CurrPos.Y));
+	MeshVertex->Initializer(Index , CurrPos, OriPos, FVector2D(CurrPos.X, CurrPos.Y));
 	SetVertices(MeshVertex);
 }
 
@@ -52,7 +44,7 @@ UMeshTriangle* UPrimitiveMeshComponent::InitializedTriangle(int V0Index, int V1I
 	if((V2Index < 0 || V2Index >= _Vertices.Num())) return NewObject<UMeshTriangle>();
 
 	UMeshTriangle* MeshTriangle = NewObject<UMeshTriangle>();
-	MeshTriangle->Initializer(_Mesh, V0Index, V1Index, V2Index);
+	MeshTriangle->Initializer(V0Index, V1Index, V2Index);
 	
 	// Add Triangle (in this Mesh and UMeshVertex)
 	SetTriangle(MeshTriangle);
@@ -94,7 +86,7 @@ void UPrimitiveMeshComponent::AddTriangleToEdge(AProceduralMesh* Mesh, UProcedur
 	if(ContainKey == false)
 	{
 		UMeshEdge* MeshEdges = NewObject<UMeshEdge>();
-		MeshEdges->Initializer(Mesh, MeshVertexPair->Vertex0Index, MeshVertexPair->Vertex1Index);
+		MeshEdges->Initializer(MeshVertexPair->Vertex0Index, MeshVertexPair->Vertex1Index);
 		SetEdges(MakeTuple(_Edges.Num(), MeshVertexPair->Vertex0Index, MeshVertexPair->Vertex1Index, MeshEdges));
 		MeshEdges->SetTriangle(MeshTriangle);
 	}
@@ -278,7 +270,6 @@ UMeshVertex* UPrimitiveMeshComponent::CreateVertexOnEdge(UMeshVertex* V0, UMeshV
 			int32 NewVertexIndex = _Vertices.Num();
 			UMeshVertex* MeshVertex = NewObject<UMeshVertex>();
 			MeshVertex->Initializer(
-				_Mesh,
 				NewVertexIndex,
 				(1 - T) * V0->CurrentPosition + T * V1->CurrentPosition, 
 				(1 - T) * V0->OriginalPosition + T * V1->OriginalPosition,
@@ -339,7 +330,6 @@ UMeshVertex* UPrimitiveMeshComponent::CreateVertexInTriangle(UMeshTriangle* Mesh
 	int NewVertexIndex = _Vertices.Num();
 	UMeshVertex* MeshVertex = NewObject<UMeshVertex>();
 	MeshVertex->Initializer(
-				_Mesh,
 				NewVertexIndex,
 				(1 - U - V) * V0->CurrentPosition + U * V2->CurrentPosition + V * V1->CurrentPosition,
 				(1 - U - V) * V0->OriginalPosition + U * V2->OriginalPosition + V * V1->OriginalPosition,
@@ -373,7 +363,7 @@ UMeshVertex* UPrimitiveMeshComponent::CreateVertexInTriangle(UMeshTriangle* Mesh
 void UPrimitiveMeshComponent::RemoveMeshTriangle(UMeshTriangle* MeshTri)
 {
 	bool IsRemoved = false;
-	IsRemoved = RemoveTriangle(MeshTri);
+	IsRemoved = IsRemoveTriangle(MeshTri);
 	if(IsRemoved == false) return;
 	
 	RemoveTriangleFromEdge(MeshTri->Vertex0Index, MeshTri->Vertex1Index, MeshTri);
@@ -425,7 +415,7 @@ UMeshTriangle* UPrimitiveMeshComponent::CreateNewTriangle(int32 V0Index, int32 V
 	if((V2Index < 0 || V2Index >= _Vertices.Num())) return NewObject<UMeshTriangle>();
 
 	UMeshTriangle* MeshTriangle= NewObject<UMeshTriangle>();
-	MeshTriangle->Initializer(_Mesh, V0Index, V1Index, V2Index);
+	MeshTriangle->Initializer(V0Index, V1Index, V2Index);
 	SetTriangle(MeshTriangle);
 	
 	_Vertices[V0Index]->SetTriangle(MeshTriangle);
@@ -461,7 +451,7 @@ void UPrimitiveMeshComponent::AddTriangleToEdge(UProcedureMeshVertexPair* MeshVe
 	if(IsExist == false)
 	{
 		UMeshEdge* MeshEdge = NewObject<UMeshEdge>();
-		MeshEdge->Initializer(_Mesh, MeshVertexPair->Vertex0Index, MeshVertexPair->Vertex1Index);
+		MeshEdge->Initializer(MeshVertexPair->Vertex0Index, MeshVertexPair->Vertex1Index);
 		MeshEdge->SetTriangle(MeshTriangle);
 		SetEdges(MakeTuple(_Edges.Num(), MeshVertexPair->Vertex0Index, MeshVertexPair->Vertex1Index, MeshEdge));
 	}

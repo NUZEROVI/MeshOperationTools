@@ -12,9 +12,8 @@ UMeshTriangle::UMeshTriangle()
 	IsNull = true;
 }
 
-void UMeshTriangle::Initializer(AProceduralMesh* Mesh, const int& V0Index, const int& V1Index, const int& V2Index)
+void UMeshTriangle::Initializer(const int& V0Index, const int& V1Index, const int& V2Index)
 {
-	_Mesh = Mesh;
 	Vertex0Index = V0Index;
 	Vertex1Index = V1Index;
 	Vertex2Index = V2Index;
@@ -28,7 +27,7 @@ TArray<UMeshEdge*> UMeshTriangle::GetEdge()
 	UMeshEdge* Edges1;
 	UMeshEdge* Edges2;
 	
-	for (TTuple<int32, int32, int32, UMeshEdge*> EdgesData : GetMeshComponent()->GetEdges())
+	for (TTuple<int32, int32, int32, UMeshEdge*> EdgesData : GetEdges())
 	{
 		if(EdgesData.Get<1>() == Vertex0Index && EdgesData.Get<2>() == Vertex1Index) { Edges0 = EdgesData.Get<3>(); }
 		if(EdgesData.Get<1>() == Vertex1Index && EdgesData.Get<2>() == Vertex2Index) { Edges1 = EdgesData.Get<3>(); }
@@ -62,7 +61,7 @@ void UMeshTriangle::Dispose()
 {
 	if(_IsDisposed == false)
 	{
-		_Mesh = nullptr;
+		SetMesh(nullptr);
 	}
 	_IsDisposed = true;
 }

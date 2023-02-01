@@ -15,9 +15,8 @@ UMeshVertex::UMeshVertex()
 	IsNull = true;
 }
 
-void UMeshVertex::Initializer(AProceduralMesh* Mesh, const int& Index, const FVector& CurrPos, const FVector& OriPos, const FVector2D& MeshUVs)
+void UMeshVertex::Initializer(const int& Index, const FVector& CurrPos, const FVector& OriPos, const FVector2D& MeshUVs)
 {
-	_Mesh = Mesh;
 	VertexIndex = Index;
 	CurrentPosition = CurrPos;
 	OriginalPosition = OriPos;

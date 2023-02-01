@@ -9,11 +9,10 @@
 
 #include "CoreMinimal.h"
 #include "PrimitiveMeshComponent.h"
-#include "Components/ActorComponent.h"
 #include "MeshTriangle.generated.h"
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
-class MESHOPERATIONTOOLS_API UMeshTriangle : public UActorComponent
+class MESHOPERATIONTOOLS_API UMeshTriangle : public UPrimitiveMeshComponent
 {
 	GENERATED_BODY()
 
@@ -38,21 +37,16 @@ public:
 	bool operator == (const UMeshTriangle &b) const { return Vertex0Index == b.Vertex0Index && Vertex1Index == b.Vertex1Index &&	Vertex2Index == b.Vertex2Index;	}
 
 	/* Initialization */
-	void Initializer(AProceduralMesh* Mesh, const int& V0Index, const int& V1Index, const int& V2Index);
+	void Initializer(const int& V0Index, const int& V1Index, const int& V2Index);
 	
 	/* Getters */
-	UPrimitiveMeshComponent* GetMeshComponent() { return  PrimitiveMeshComponent; }
-	AProceduralMesh* GetMesh() { return _Mesh; }
 	TArray<UMeshEdge*> GetEdge();
 	
 	/* Setters */
-	FORCEINLINE void SetMeshComponent(UPrimitiveMeshComponent* MeshComponent) { PrimitiveMeshComponent = MeshComponent; }
 	void ShuffleVertexIndices(const int& V0Index, const int& V1Index);
 	void Dispose();
 
 private:
 	/* Attributes */
-	UPrimitiveMeshComponent* PrimitiveMeshComponent;
-	AProceduralMesh* _Mesh;
 	bool _IsDisposed = false;	
 };

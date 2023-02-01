@@ -88,7 +88,7 @@ void AProceduralMesh::LoadMeshVertices()
 	for(int i = 0; i < Indices.Num(); i += 3) { PrimitiveMeshComponent->InitializedTriangle(Indices[i], Indices[i + 1], Indices[i + 2]);	}
 	
 	// Set OriginalEdge
-	for (TTuple<int32, int32, int32, UMeshEdge*> Edge : PrimitiveMeshComponent->GetEdges()) { Edge.Get<3>()->OriginalEdge = true; }
+	for (TTuple<int32, int32, int32, UMeshEdge*> Edge : PrimitiveMeshComponent->GetEdges()) { Edge.Get<3>()->SetOriEdge(true); }
 
 	ProceduralMesh->CreateMeshSection_LinearColor(
 		0,

@@ -15,7 +15,7 @@
 class UPrimitiveMeshComponent;
 
 UCLASS()
-class MESHOPERATIONTOOLS_API AProceduralMesh : public AActor
+class MESHOPERATIONTOOLS_API AProceduralMesh : public AActor 
 {
 	GENERATED_BODY()
 	

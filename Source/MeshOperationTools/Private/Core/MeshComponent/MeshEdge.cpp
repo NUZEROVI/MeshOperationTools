@@ -14,9 +14,8 @@ UMeshEdge::UMeshEdge()
 	IsNull = true;
 }
 
-void UMeshEdge::Initializer(AProceduralMesh* Mesh, const int& V0, const int& V1)
+void UMeshEdge::Initializer(const int& V0, const int& V1)
 {
-	_Mesh = Mesh;
 	Vertex0Index = V0;
 	Vertex1Index = V1;
 	IsNull = false;
@@ -25,16 +24,16 @@ void UMeshEdge::Initializer(AProceduralMesh* Mesh, const int& V0, const int& V1)
 float UMeshEdge::GetCurrentLength()
 {
 	
-	FVector V0 = GetMeshComponent()->GetVertices()[Vertex0Index]->CurrentPosition;
-	FVector V1 = GetMeshComponent()->GetVertices()[Vertex1Index]->CurrentPosition;
+	FVector V0 = GetVertices()[Vertex0Index]->CurrentPosition;
+	FVector V1 = GetVertices()[Vertex1Index]->CurrentPosition;
 	
 	return (V0 - V1).Size(); 
 }
 
 float UMeshEdge::GetInitialLength()
 {
-	FVector V0 = GetMeshComponent()->GetVertices()[Vertex0Index]->OriginalPosition;
-	FVector V1 = GetMeshComponent()->GetVertices()[Vertex1Index]->OriginalPosition;
+	FVector V0 = GetVertices()[Vertex0Index]->OriginalPosition;
+	FVector V1 = GetVertices()[Vertex1Index]->OriginalPosition;
 	
 	return (V0 - V1).Size(); 
 }
@@ -44,7 +43,7 @@ void UMeshEdge::Dispose()
 	if(_IsDisposed == false)
 	{
 		_Triangles.Empty();
-		_Mesh = nullptr;
+		SetMesh(nullptr);
 	}
 	_IsDisposed = true;
 }

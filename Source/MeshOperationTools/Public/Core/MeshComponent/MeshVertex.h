@@ -9,11 +9,10 @@
 
 #include "CoreMinimal.h"
 #include "PrimitiveMeshComponent.h"
-#include "Components/ActorComponent.h"
 #include "MeshVertex.generated.h"
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
-class MESHOPERATIONTOOLS_API UMeshVertex : public UActorComponent
+class MESHOPERATIONTOOLS_API UMeshVertex : public UPrimitiveMeshComponent
 {
 	GENERATED_BODY()
 
@@ -39,23 +38,16 @@ public:
 	bool operator == (const UMeshVertex &V) const {	return CurrentPosition == V.CurrentPosition && OriginalPosition == V.OriginalPosition;	}
 	
 	/* Initialization */
-	void Initializer(AProceduralMesh* Mesh, const int& Index, const FVector& CurrPos, const FVector& OriPos, const FVector2D& MeshUVs);
+	void Initializer(const int& Index, const FVector& CurrPos, const FVector& OriPos, const FVector2D& MeshUVs);
 
 	/* Getters */
-	UPrimitiveMeshComponent* GetMeshComponent() { return  PrimitiveMeshComponent; }
-	AProceduralMesh* GetMesh() { return _Mesh; }
-	TArray<UMeshTriangle*> GetTriangles() const { return _Triangles; }
 	TArray<UMeshEdge*> GetEdge();
 	
 	/* Setters */
-	FORCEINLINE void SetMeshComponent(UPrimitiveMeshComponent* MeshComponent) { PrimitiveMeshComponent = MeshComponent; }
-	FORCEINLINE void SetTriangle(UMeshTriangle* MeshTriangle) { _Triangles.Add(MeshTriangle); }
 	FORCEINLINE void RemoveTriangle(UMeshTriangle* MeshTriangle) { _Triangles.Remove(MeshTriangle); }
 	
 private:
 	/* Attributes */
-	UPrimitiveMeshComponent* PrimitiveMeshComponent;
-	AProceduralMesh* _Mesh;
 	TArray<UMeshTriangle*> _Triangles;
 };
 

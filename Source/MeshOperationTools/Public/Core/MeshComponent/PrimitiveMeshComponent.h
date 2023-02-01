@@ -48,6 +48,9 @@ public:
 	
 	/* Getters */
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Mesh Getters")
+	FORCEINLINE AProceduralMesh* GetMesh() { return _Mesh; }
+	
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Mesh Getters")
 	FORCEINLINE TArray<UMeshVertex*> GetVertices() const { return _Vertices; }
 	
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Mesh Getters")
@@ -56,9 +59,12 @@ public:
 	FORCEINLINE TArray<TTuple<int32, int32, int32, UMeshEdge*>> GetEdges() const { return _Edges; }
 	
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Mesh Getters")
-	FORCEINLINE bool RemoveTriangle(UMeshTriangle* MeshTriangle) { return (_Triangles.Remove(MeshTriangle) == 1) ? true : false; }
+	FORCEINLINE bool IsRemoveTriangle(UMeshTriangle* MeshTriangle) { return (_Triangles.Remove(MeshTriangle) == 1) ? true : false; }
 
 	/* Setters */
+	UFUNCTION(BlueprintCallable, Category = "Mesh Setters")
+	void SetMesh(AProceduralMesh* Mesh) { _Mesh = Mesh; }
+	
 	UFUNCTION(BlueprintCallable, Category = "Mesh Setters")
 	void SetVertices(UMeshVertex* MeshVertex) { _Vertices.Add(MeshVertex); }
 	
@@ -93,12 +99,6 @@ public:
 private:
 	/* Initialized Mesh */
 	AProceduralMesh* _Mesh;
-	
-	/* Initialized Mesh Component */
-	UMeshVertex* PrimitiveMeshVertex;
-	UMeshTriangle* PrimitiveMeshTriangle;
-	UMeshEdge* PrimitiveMeshEdge;
-	UProcedureMeshVertexPair* ProcedureMeshVertexPair;
 
 	/* Initialized Mesh Data */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
