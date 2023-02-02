@@ -54,7 +54,7 @@ public:
 	FORCEINLINE TArray<UMeshVertex*> GetVertices() const { return _Vertices; }
 	
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Mesh Getters")
-	FORCEINLINE TArray<UMeshTriangle*> GetTriangles() const { return _Triangles; }
+	virtual TArray<UMeshTriangle*> GetTriangles() const { return _Triangles; }
 	
 	FORCEINLINE TArray<TTuple<int32, int32, int32, UMeshEdge*>> GetEdges() const { return _Edges; }
 	
@@ -69,7 +69,7 @@ public:
 	void SetVertices(UMeshVertex* MeshVertex) { _Vertices.Add(MeshVertex); }
 	
 	UFUNCTION(BlueprintCallable, Category = "Mesh Setters")
-	void SetTriangle(UMeshTriangle* MeshTriangle) { _Triangles.Add(MeshTriangle); }
+	virtual void SetTriangle(UMeshTriangle* MeshTriangle) { _Triangles.Add(MeshTriangle); }
 	
 	UFUNCTION(BlueprintCallable, Category = "Mesh Setters")
 	void RemoveTriangle(UMeshTriangle* MeshTriangle) { _Triangles.Remove(MeshTriangle); }

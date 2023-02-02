@@ -41,8 +41,12 @@ public:
 	void Initializer(const int& Index, const FVector& CurrPos, const FVector& OriPos, const FVector2D& MeshUVs);
 
 	/* Getters */
+	virtual TArray<UMeshTriangle*> GetTriangles() const override;
 	TArray<UMeshEdge*> GetEdgeFromTriangle();
 
+	/* Setters */
+	virtual void SetTriangle(UMeshTriangle* MeshTriangle) override;
+	
 private:
 	/* Attributes */
 	TArray<UMeshTriangle*> _Triangles;

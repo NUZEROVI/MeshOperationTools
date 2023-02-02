@@ -21,6 +21,11 @@ void UMeshEdge::Initializer(const int& V0, const int& V1)
 	IsNull = false;
 }
 
+TArray<UMeshTriangle*> UMeshEdge::GetTriangles() const
+{
+	return _Triangles;
+}
+
 float UMeshEdge::GetCurrentLength()
 {
 	
@@ -36,6 +41,11 @@ float UMeshEdge::GetInitialLength()
 	FVector V1 = GetVertices()[Vertex1Index]->OriginalPosition;
 	
 	return (V0 - V1).Size(); 
+}
+
+void UMeshEdge::SetTriangle(UMeshTriangle* MeshTriangle)
+{
+	_Triangles.Add(MeshTriangle);
 }
 
 void UMeshEdge::Dispose()

@@ -41,10 +41,12 @@ public:
 	void Initializer(const int& V0, const int& V1);
 	
 	/* Getters */
+	virtual TArray<UMeshTriangle*> GetTriangles() const override;
 	float GetCurrentLength();
 	float GetInitialLength();
 	
 	/* Setters */
+	virtual void SetTriangle(UMeshTriangle* MeshTriangle) override;
 	FORCEINLINE void SetOriEdge(bool OriEdge) { OriginalEdge = OriEdge; }
 	void Dispose();
 	
