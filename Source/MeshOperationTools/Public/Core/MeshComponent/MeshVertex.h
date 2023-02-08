@@ -49,7 +49,7 @@ public:
 	
 private:
 	/* Attributes */
-	TArray<UMeshTriangle*> _Triangles;
+	TArray<UMeshTriangle*> MeshTriangles;
 };
 
 

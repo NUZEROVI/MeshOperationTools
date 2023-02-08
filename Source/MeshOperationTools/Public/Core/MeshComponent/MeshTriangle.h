@@ -48,5 +48,5 @@ public:
 
 private:
 	/* Attributes */
-	bool _IsDisposed = false;	
+	bool IsDisposed = false;	
 };

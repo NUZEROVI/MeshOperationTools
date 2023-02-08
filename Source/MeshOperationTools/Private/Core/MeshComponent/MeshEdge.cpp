@@ -23,7 +23,7 @@ void UMeshEdge::Initializer(const int& V0, const int& V1)
 
 TArray<UMeshTriangle*> UMeshEdge::GetTriangles() const
 {
-	return _Triangles;
+	return MeshTriangles;
 }
 
 float UMeshEdge::GetCurrentLength()
@@ -45,17 +45,17 @@ float UMeshEdge::GetInitialLength()
 
 void UMeshEdge::SetTriangle(UMeshTriangle* MeshTriangle)
 {
-	_Triangles.Add(MeshTriangle);
+	MeshTriangles.Add(MeshTriangle);
 }
 
 void UMeshEdge::Dispose()
 {
-	if(_IsDisposed == false)
+	if(IsDisposed == false)
 	{
-		_Triangles.Empty();
+		MeshTriangles.Empty();
 		SetMesh(nullptr);
 	}
-	_IsDisposed = true;
+	IsDisposed = true;
 }
 
 void UMeshEdge::BeginPlay()
