@@ -48,33 +48,33 @@ public:
 	
 	/* Getters */
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Mesh Getters")
-	FORCEINLINE AProceduralMesh* GetMesh() { return _Mesh; }
+	FORCEINLINE AProceduralMesh* GetMesh() { return ProceduralMesh; }
 	
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Mesh Getters")
-	FORCEINLINE TArray<UMeshVertex*> GetVertices() const { return _Vertices; }
+	FORCEINLINE TArray<UMeshVertex*> GetVertices() const { return MeshVertices; }
 	
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Mesh Getters")
-	virtual TArray<UMeshTriangle*> GetTriangles() const { return _Triangles; }
+	virtual TArray<UMeshTriangle*> GetTriangles() const { return MeshTriangles; }
 	
-	FORCEINLINE TArray<TTuple<int32, int32, int32, UMeshEdge*>> GetEdges() const { return _Edges; }
+	FORCEINLINE TMap<int32, TTuple<int32, int32, UMeshEdge*>> GetEdges() const { return MeshEdges; }
 	
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Mesh Getters")
-	FORCEINLINE bool IsRemoveTriangle(UMeshTriangle* MeshTriangle) { return (_Triangles.Remove(MeshTriangle) == 1) ? true : false; }
+	FORCEINLINE bool IsRemoveTriangle(UMeshTriangle* MeshTriangle) { return (MeshTriangles.Remove(MeshTriangle) == 1) ? true : false; }
 
 	/* Setters */
 	UFUNCTION(BlueprintCallable, Category = "Mesh Setters")
-	void SetMesh(AProceduralMesh* Mesh) { _Mesh = Mesh; }
+	void SetMesh(AProceduralMesh* Mesh) { ProceduralMesh = Mesh; }
 	
 	UFUNCTION(BlueprintCallable, Category = "Mesh Setters")
-	void SetVertices(UMeshVertex* MeshVertex) { _Vertices.Add(MeshVertex); }
+	void SetVertices(UMeshVertex* Vertex) { MeshVertices.Add(Vertex); }
 	
 	UFUNCTION(BlueprintCallable, Category = "Mesh Setters")
-	virtual void SetTriangle(UMeshTriangle* MeshTriangle) { _Triangles.Add(MeshTriangle); }
+	virtual void SetTriangle(UMeshTriangle* MeshTriangle) { MeshTriangles.Add(MeshTriangle); }
 	
 	UFUNCTION(BlueprintCallable, Category = "Mesh Setters")
-	void RemoveTriangle(UMeshTriangle* MeshTriangle) { _Triangles.Remove(MeshTriangle); }
+	void RemoveTriangle(UMeshTriangle* MeshTriangle) { MeshTriangles.Remove(MeshTriangle); }
 
-	void SetEdges(TTuple<int32, int32, int32, UMeshEdge*> Edge) { _Edges.Add(Edge); }
+	void SetEdges(int32 index, TTuple<int32, int32, UMeshEdge*> MeshEdge) { MeshEdges.Add(index, MeshEdge); }
 
 	/* To Catch information about the clicked Mesh */
 	UFUNCTION(BlueprintCallable, Category = "RuntimeMesh Methods")
@@ -93,22 +93,25 @@ public:
 	UMeshVertex* CreateVertexInTriangle(UMeshTriangle* MeshTri, float U, float V);
 
 	// To Set Runtime Mesh return value
-	int _DragVertexIndex = -1; 
-	bool _IsOriVertices = false;
-	int GetDragVertexIndex(){ return _DragVertexIndex; }
-	bool GetIsOriVertices() { return _IsOriVertices; }
+	int DragVertexIndex = -1; 
+	bool IsOriVertices = false;
+	int GetDragVertexIndex(){ return DragVertexIndex; }
+	bool GetIsOriVertices() { return IsOriVertices; }
 	
 // Attributes
 private:
 	/* Initialized Mesh */
-	AProceduralMesh* _Mesh;
+	AProceduralMesh* ProceduralMesh;
 
 	/* Initialized Mesh Data */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
-	TArray<UMeshVertex*> _Vertices;
+	TArray<UMeshVertex*> MeshVertices;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
-	TArray<UMeshTriangle*> _Triangles;
-	TArray<TTuple<int32, int32, int32, UMeshEdge*>> _Edges;
+	TArray<UMeshTriangle*> MeshTriangles;
+
+	// TTuple<int32, int32, UMeshEdge*> Edge;
+	TMap<int32, TTuple<int32, int32, UMeshEdge*>> MeshEdges;
+	//TArray<TTuple<int32, int32, int32, UMeshEdge*>> _Edges;
 
 	/* Methods */
 	void RemoveMeshTriangle(UMeshTriangle* MeshTri);

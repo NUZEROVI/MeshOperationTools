@@ -31,7 +31,7 @@ void UPrimitiveMeshComponent::TickComponent(float DeltaTime, ELevelTick TickType
 
 void UPrimitiveMeshComponent::InitializedVertices(AProceduralMesh* Mesh, const int& Index, const FVector& CurrPos, const FVector& OriPos, const FVector2D& MeshUVs)
 {
-	_Mesh = Mesh;
+	ProceduralMesh = Mesh;
 	UMeshVertex* MeshVertex = NewObject<UMeshVertex>();
 	MeshVertex->Initializer(Index , CurrPos, OriPos, FVector2D(CurrPos.X, CurrPos.Y));
 	SetVertices(MeshVertex);
@@ -39,29 +39,29 @@ void UPrimitiveMeshComponent::InitializedVertices(AProceduralMesh* Mesh, const i
 
 UMeshTriangle* UPrimitiveMeshComponent::InitializedTriangle(int V0Index, int V1Index, int V2Index)
 {
-	if((V0Index < 0 || V0Index >= _Vertices.Num())) return NewObject<UMeshTriangle>();
-	if((V1Index < 0 || V1Index >= _Vertices.Num())) return NewObject<UMeshTriangle>();
-	if((V2Index < 0 || V2Index >= _Vertices.Num())) return NewObject<UMeshTriangle>();
+	if((V0Index < 0 || V0Index >= MeshVertices.Num())) return NewObject<UMeshTriangle>();
+	if((V1Index < 0 || V1Index >= MeshVertices.Num())) return NewObject<UMeshTriangle>();
+	if((V2Index < 0 || V2Index >= MeshVertices.Num())) return NewObject<UMeshTriangle>();
 
 	UMeshTriangle* MeshTriangle = NewObject<UMeshTriangle>();
 	MeshTriangle->Initializer(V0Index, V1Index, V2Index);
 	
 	// Add Triangle (in this Mesh and UMeshVertex)
 	SetTriangle(MeshTriangle);
-	_Vertices[V0Index]->SetTriangle(MeshTriangle);
-	_Vertices[V1Index]->SetTriangle(MeshTriangle);
-	_Vertices[V2Index]->SetTriangle(MeshTriangle);
+	MeshVertices[V0Index]->SetTriangle(MeshTriangle);
+	MeshVertices[V1Index]->SetTriangle(MeshTriangle);
+	MeshVertices[V2Index]->SetTriangle(MeshTriangle);
 
 	// Set Edges
 	UProcedureMeshVertexPair* Pair1 = NewObject<UProcedureMeshVertexPair>();
 	Pair1->Initializer(V0Index, V1Index);
-	AddTriangleToEdge(_Mesh, Pair1, MeshTriangle);
+	AddTriangleToEdge(ProceduralMesh, Pair1, MeshTriangle);
 	UProcedureMeshVertexPair* Pair2 = NewObject<UProcedureMeshVertexPair>();
 	Pair2->Initializer(V1Index, V2Index);
-	AddTriangleToEdge(_Mesh, Pair2, MeshTriangle);
+	AddTriangleToEdge(ProceduralMesh, Pair2, MeshTriangle);
 	UProcedureMeshVertexPair* Pair3 = NewObject<UProcedureMeshVertexPair>();
 	Pair3->Initializer(V2Index, V0Index);
-	AddTriangleToEdge(_Mesh, Pair3, MeshTriangle);
+	AddTriangleToEdge(ProceduralMesh, Pair3, MeshTriangle);
 
 	return MeshTriangle;
 }
@@ -71,10 +71,10 @@ void UPrimitiveMeshComponent::AddTriangleToEdge(AProceduralMesh* Mesh, UProcedur
 	bool ContainKey = false;
 	
 	// To check if 'MeshEdge' exists.
-	for (TTuple<int32, int32, int32, UMeshEdge*> MeshEdge : GetEdges())
+	for (TPair<int32, TTuple<int32, int32, UMeshEdge*>>& MeshEdge : MeshEdges)
 	{
-		int32  V0Index = MeshEdge.Get<1>();
-		int32  V1Index = MeshEdge.Get<2>();
+		int32  V0Index = MeshEdge.Value.Get<0>();
+		int32  V1Index = MeshEdge.Value.Get<1>();
 		if((V0Index == MeshVertexPair->Vertex0Index && V1Index == MeshVertexPair->Vertex1Index))
 		{
 			ContainKey = true; // 'MeshEdge' exists.
@@ -85,10 +85,10 @@ void UPrimitiveMeshComponent::AddTriangleToEdge(AProceduralMesh* Mesh, UProcedur
 	// 'MeshEdge' not exists.
 	if(ContainKey == false)
 	{
-		UMeshEdge* MeshEdges = NewObject<UMeshEdge>();
-		MeshEdges->Initializer(MeshVertexPair->Vertex0Index, MeshVertexPair->Vertex1Index);
-		SetEdges(MakeTuple(_Edges.Num(), MeshVertexPair->Vertex0Index, MeshVertexPair->Vertex1Index, MeshEdges));
-		MeshEdges->SetTriangle(MeshTriangle);
+		UMeshEdge* Edge = NewObject<UMeshEdge>();
+		Edge->Initializer(MeshVertexPair->Vertex0Index, MeshVertexPair->Vertex1Index);
+		SetEdges(MeshEdges.Num(), MakeTuple(MeshVertexPair->Vertex0Index, MeshVertexPair->Vertex1Index, Edge));
+		Edge->SetTriangle(MeshTriangle);
 	}
 }
 
@@ -122,9 +122,9 @@ UMeshTriangle* UPrimitiveMeshComponent::GetClosestTriangleToLineSegment(FVector 
 		bool InsideTriangle;
 		FVector IntersectionPoint, ClosestTriNormal;
 		InsideTriangle = FMath::SegmentTriangleIntersection(P, Q,
-			 _Vertices[MeshTriangle->Vertex0Index]->CurrentPosition,
-			_Vertices[MeshTriangle->Vertex1Index]->CurrentPosition,
-			_Vertices[MeshTriangle->Vertex2Index]->CurrentPosition,
+			 MeshVertices[MeshTriangle->Vertex0Index]->CurrentPosition,
+			MeshVertices[MeshTriangle->Vertex1Index]->CurrentPosition,
+			MeshVertices[MeshTriangle->Vertex2Index]->CurrentPosition,
 			IntersectionPoint,
 			ClosestTriNormal);
 
@@ -138,8 +138,8 @@ UMeshTriangle* UPrimitiveMeshComponent::GetClosestTriangleToLineSegment(FVector 
 				ClosestTriangle->IsNull = false;
 				ClosestSquareDistance = SqrDistance;
 				
-				float Matrix00 = _Vertices[MeshTriangle->Vertex2Index]->CurrentPosition.X - _Vertices[MeshTriangle->Vertex0Index]->CurrentPosition.X;
-				float Matrix11 = _Vertices[MeshTriangle->Vertex1Index]->CurrentPosition.Y - _Vertices[MeshTriangle->Vertex0Index]->CurrentPosition.Y;
+				float Matrix00 = MeshVertices[MeshTriangle->Vertex2Index]->CurrentPosition.X - MeshVertices[MeshTriangle->Vertex0Index]->CurrentPosition.X;
+				float Matrix11 = MeshVertices[MeshTriangle->Vertex1Index]->CurrentPosition.Y - MeshVertices[MeshTriangle->Vertex0Index]->CurrentPosition.Y;
 				float Matrix22 = P.Z - Q.Z;
 				float Matrix12 = P.Y - Q.Y;
 				float Matrix02 = P.X - Q.X;
@@ -151,8 +151,8 @@ UMeshTriangle* UPrimitiveMeshComponent::GetClosestTriangleToLineSegment(FVector 
 					return ClosestTriangle;
 				}
 
-				U = ( P.X - (_Vertices[MeshTriangle->Vertex0Index]->CurrentPosition.X) ) / ( (_Vertices[MeshTriangle->Vertex2Index]->CurrentPosition.X) - (_Vertices[MeshTriangle->Vertex0Index]->CurrentPosition.X));
-				V = ( P.Y - (_Vertices[MeshTriangle->Vertex0Index]->CurrentPosition.Y) ) / ( (_Vertices[MeshTriangle->Vertex1Index]->CurrentPosition.Y) - (_Vertices[MeshTriangle->Vertex0Index]->CurrentPosition.Y));
+				U = ( P.X - (MeshVertices[MeshTriangle->Vertex0Index]->CurrentPosition.X) ) / ( (MeshVertices[MeshTriangle->Vertex2Index]->CurrentPosition.X) - (MeshVertices[MeshTriangle->Vertex0Index]->CurrentPosition.X));
+				V = ( P.Y - (MeshVertices[MeshTriangle->Vertex0Index]->CurrentPosition.Y) ) / ( (MeshVertices[MeshTriangle->Vertex1Index]->CurrentPosition.Y) - (MeshVertices[MeshTriangle->Vertex0Index]->CurrentPosition.Y));
 			}
 		}
 	}
@@ -169,9 +169,9 @@ UMeshVertex* UPrimitiveMeshComponent::GetVertexOnClosestEdge(UMeshTriangle* Clos
 {
 	float SqrSnapDistance = SnapDist * SnapDist;
 	
-	UMeshVertex* V0 = _Vertices[ClosestTri->Vertex0Index];
-	UMeshVertex* V1 = _Vertices[ClosestTri->Vertex1Index]; 
-	UMeshVertex* V2 = _Vertices[ClosestTri->Vertex2Index];
+	UMeshVertex* V0 = MeshVertices[ClosestTri->Vertex0Index];
+	UMeshVertex* V1 = MeshVertices[ClosestTri->Vertex1Index]; 
+	UMeshVertex* V2 = MeshVertices[ClosestTri->Vertex2Index];
 
 	float t0, t1, t2;
 	FVector P0 = FMath::ClosestPointOnSegment(ClosestPoint, V1->CurrentPosition, V2->CurrentPosition);
@@ -196,14 +196,14 @@ UMeshVertex* UPrimitiveMeshComponent::GetVertexOnClosestEdge(UMeshTriangle* Clos
 			float sqrDistanceP0V2 = (P0 - V2->CurrentPosition).SizeSquared() ;
 			if (sqrDistanceP0V1 <= SqrSnapDistance && sqrDistanceP0V1 < sqrDistanceP0V2)
 			{
-				_DragVertexIndex = ClosestTri->Vertex1Index;
-				_IsOriVertices = true;
+				DragVertexIndex = ClosestTri->Vertex1Index;
+				IsOriVertices = true;
 				return V1;
 			}
 			if (sqrDistanceP0V2 <= SqrSnapDistance && sqrDistanceP0V2 < sqrDistanceP0V1)
 			{
-				_DragVertexIndex = ClosestTri->Vertex2Index;
-				_IsOriVertices = true;
+				DragVertexIndex = ClosestTri->Vertex2Index;
+				IsOriVertices = true;
 				return V2;
 			}
 			return CreateVertexOnEdge(V1, V2, t0);
@@ -215,14 +215,14 @@ UMeshVertex* UPrimitiveMeshComponent::GetVertexOnClosestEdge(UMeshTriangle* Clos
 			float sqrDistanceP1V2 = (P1 - V2->CurrentPosition).SizeSquared() ;
 			if (sqrDistanceP1V0 <= SqrSnapDistance && sqrDistanceP1V0 < sqrDistanceP1V2)
 			{
-				_DragVertexIndex = ClosestTri->Vertex0Index;
-				_IsOriVertices = true;
+				DragVertexIndex = ClosestTri->Vertex0Index;
+				IsOriVertices = true;
 				return V0;
 			}
 			if (sqrDistanceP1V2 <= SqrSnapDistance && sqrDistanceP1V2 < sqrDistanceP1V0)
 			{
-				_DragVertexIndex = ClosestTri->Vertex2Index;
-				_IsOriVertices = true;
+				DragVertexIndex = ClosestTri->Vertex2Index;
+				IsOriVertices = true;
 				return V2;
 			}
 			return CreateVertexOnEdge(V2, V0, t1);
@@ -234,14 +234,14 @@ UMeshVertex* UPrimitiveMeshComponent::GetVertexOnClosestEdge(UMeshTriangle* Clos
 			float sqrDistanceP2V1 = (P2 - V1->CurrentPosition).SizeSquared() ;
 			if (sqrDistanceP2V0 <= SqrSnapDistance && sqrDistanceP2V0 < sqrDistanceP2V1)
 			{
-				_DragVertexIndex = ClosestTri->Vertex0Index;
-				_IsOriVertices = true;
+				DragVertexIndex = ClosestTri->Vertex0Index;
+				IsOriVertices = true;
 				return V0;
 			}
 			if (sqrDistanceP2V1 <= SqrSnapDistance && sqrDistanceP2V1 < sqrDistanceP2V0)
 			{
-				_DragVertexIndex = ClosestTri->Vertex1Index;
-				_IsOriVertices = true;
+				DragVertexIndex = ClosestTri->Vertex1Index;
+				IsOriVertices = true;
 				return V1;
 			}
 			return CreateVertexOnEdge(V0, V1, t2);
@@ -253,21 +253,22 @@ UMeshVertex* UPrimitiveMeshComponent::GetVertexOnClosestEdge(UMeshTriangle* Clos
 
 UMeshVertex* UPrimitiveMeshComponent::CreateVertexOnEdge(UMeshVertex* V0, UMeshVertex* V1, float T)
 {
-	bool ContainKey = false;
+	bool ContainKey;
+	ContainKey = false;
 	int32  V0Index, V1Index;
-	for (TTuple<int32, int32, int32, UMeshEdge*> MeshEdge : _Edges)
+	for (TPair<int32, TTuple<int32, int32, UMeshEdge*>>& Edge : MeshEdges)
 	{
-		V0Index =  MeshEdge.Get<1>();
-		V1Index = MeshEdge.Get<2>();
+		V0Index = Edge.Value.Get<0>();
+		V1Index = Edge.Value.Get<1>();
 		
 		if((V0Index == V0->VertexIndex) && (V1Index == V1->VertexIndex)) //Contain
 		{
 			ContainKey = true;
 			
-			bool OriginalEdge = MeshEdge.Get<3>()->OriginalEdge;
-			TArray<UMeshTriangle*> TrianglesToReplace =  MeshEdge.Get<3>()->GetTriangles();
+			bool OriginalEdge = Edge.Value.Get<2>()->OriginalEdge;
+			TArray<UMeshTriangle*> TrianglesToReplace =  Edge.Value.Get<2>()->GetTriangles();
 			
-			int32 NewVertexIndex = _Vertices.Num();
+			int32 NewVertexIndex = MeshVertices.Num();
 			UMeshVertex* MeshVertex = NewObject<UMeshVertex>();
 			MeshVertex->Initializer(
 				NewVertexIndex,
@@ -275,16 +276,16 @@ UMeshVertex* UPrimitiveMeshComponent::CreateVertexOnEdge(UMeshVertex* V0, UMeshV
 				(1 - T) * V0->OriginalPosition + T * V1->OriginalPosition,
 				(1 - T) * V0->UVs + T * V1->UVs);
 			
-			if(_Vertices.Contains(MeshVertex) == false)
+			if(MeshVertices.Contains(MeshVertex) == false)
 			{
 				SetVertices(MeshVertex);
 			}else
 			{
 				int32 index;
-				_Vertices.Find(MeshVertex, index);
+				MeshVertices.Find(MeshVertex, index);
 				NewVertexIndex = index ;
-				_DragVertexIndex  = index;
-				_IsOriVertices = true;
+				DragVertexIndex  = index;
+				IsOriVertices = true;
 				return MeshVertex;
 			}
 	
@@ -297,22 +298,22 @@ UMeshVertex* UPrimitiveMeshComponent::CreateVertexOnEdge(UMeshVertex* V0, UMeshV
 			}
 			RemoveUnusedEdges();
 
-			for (TTuple<int32, int32, int32, UMeshEdge*> Edge : _Edges)
+			for (TPair<int32, TTuple<int32, int32, UMeshEdge*>>& MeshEdge : MeshEdges)
 			{
-				V0Index = Edge.Get<1>();
-				V1Index = Edge.Get<2>();
+				V0Index = MeshEdge.Value.Get<0>();
+				V1Index = MeshEdge.Value.Get<1>();
 				if((V0Index == V0->VertexIndex) && (V1Index == NewVertexIndex))
 				{
-					Edge.Get<3>()->SetOriEdge(OriginalEdge);
+					MeshEdge.Value.Get<2>()->SetOriEdge(OriginalEdge);
 				}
 				if((V0Index == V1->VertexIndex) && (V1Index == NewVertexIndex))
 				{
-					Edge.Get<3>()->SetOriEdge(OriginalEdge);
+					MeshEdge.Value.Get<2>()->SetOriEdge(OriginalEdge);
 				}
 			}
 			
-			_DragVertexIndex = NewVertexIndex;
-			_IsOriVertices = false;
+			DragVertexIndex = NewVertexIndex;
+			IsOriVertices = false;
 			return MeshVertex;
 		}
 	}
@@ -323,11 +324,11 @@ UMeshVertex* UPrimitiveMeshComponent::CreateVertexOnEdge(UMeshVertex* V0, UMeshV
 
 UMeshVertex* UPrimitiveMeshComponent::CreateVertexInTriangle(UMeshTriangle* MeshTri, float U, float V)
 {
-	UMeshVertex* V0 = _Vertices[MeshTri->Vertex0Index];
-	UMeshVertex* V1 = _Vertices[MeshTri->Vertex1Index];
-	UMeshVertex* V2 = _Vertices[MeshTri->Vertex2Index];
+	UMeshVertex* V0 = MeshVertices[MeshTri->Vertex0Index];
+	UMeshVertex* V1 = MeshVertices[MeshTri->Vertex1Index];
+	UMeshVertex* V2 = MeshVertices[MeshTri->Vertex2Index];
 
-	int NewVertexIndex = _Vertices.Num();
+	int NewVertexIndex = MeshVertices.Num();
 	UMeshVertex* MeshVertex = NewObject<UMeshVertex>();
 	MeshVertex->Initializer(
 				NewVertexIndex,
@@ -335,16 +336,16 @@ UMeshVertex* UPrimitiveMeshComponent::CreateVertexInTriangle(UMeshTriangle* Mesh
 				(1 - U - V) * V0->OriginalPosition + U * V2->OriginalPosition + V * V1->OriginalPosition,
 				(1 - U - V) * V0->UVs + U * V2->UVs + V * V1->UVs );
 	
-	if(_Vertices.Contains(MeshVertex) == false)
+	if(MeshVertices.Contains(MeshVertex) == false)
 	{
-		_Vertices.Add(MeshVertex); 
+		MeshVertices.Add(MeshVertex); 
 	}else
 	{
 		int32 index;
-		_Vertices.Find(MeshVertex, index);
+		MeshVertices.Find(MeshVertex, index);
 		NewVertexIndex = index ;
-		_DragVertexIndex  = index;
-		_IsOriVertices = true;
+		DragVertexIndex  = index;
+		IsOriVertices = true;
 		return MeshVertex;
 	}
 
@@ -354,15 +355,15 @@ UMeshVertex* UPrimitiveMeshComponent::CreateVertexInTriangle(UMeshTriangle* Mesh
 	CreateNewTriangle(NewVertexIndex, MeshTri->Vertex2Index, MeshTri->Vertex0Index);
 	RemoveUnusedEdges();
 
-	_DragVertexIndex = NewVertexIndex;
-	_IsOriVertices = false;
+	DragVertexIndex = NewVertexIndex;
+	IsOriVertices = false;
 	
 	return MeshVertex;
 }
 
 void UPrimitiveMeshComponent::RemoveMeshTriangle(UMeshTriangle* MeshTri)
 {
-	bool IsRemoved = false;
+	bool IsRemoved;
 	IsRemoved = IsRemoveTriangle(MeshTri);
 	if(IsRemoved == false) return;
 	
@@ -370,9 +371,9 @@ void UPrimitiveMeshComponent::RemoveMeshTriangle(UMeshTriangle* MeshTri)
 	RemoveTriangleFromEdge(MeshTri->Vertex1Index, MeshTri->Vertex2Index, MeshTri);
 	RemoveTriangleFromEdge(MeshTri->Vertex2Index, MeshTri->Vertex0Index, MeshTri);
 
-	_Vertices[MeshTri->Vertex0Index]->RemoveTriangle(MeshTri);
-	_Vertices[MeshTri->Vertex1Index]->RemoveTriangle(MeshTri);
-	_Vertices[MeshTri->Vertex2Index]->RemoveTriangle(MeshTri);
+	MeshVertices[MeshTri->Vertex0Index]->RemoveTriangle(MeshTri);
+	MeshVertices[MeshTri->Vertex1Index]->RemoveTriangle(MeshTri);
+	MeshVertices[MeshTri->Vertex2Index]->RemoveTriangle(MeshTri);
 
 	MeshTri->Dispose();
 
@@ -382,9 +383,9 @@ void UPrimitiveMeshComponent::RemoveTriangleFromEdge(int32 V0, int32 V1, UMeshTr
 {
 	bool IsExist = false;
 	
-	for (TTuple<int32, int32, int32, UMeshEdge*> MeshEdge : _Edges)
+	for (TPair<int32, TTuple<int32, int32, UMeshEdge*>>& MeshEdge : MeshEdges)
 	{
-		if(V0 == MeshEdge.Get<1>() && V1 == MeshEdge.Get<2>())
+		if(V0 == MeshEdge.Value.Get<0>() && V1 == MeshEdge.Value.Get<1>())
 		{
 			IsExist = true;
 			break;
@@ -393,13 +394,13 @@ void UPrimitiveMeshComponent::RemoveTriangleFromEdge(int32 V0, int32 V1, UMeshTr
 
 	if(IsExist)
 	{
-		for (TTuple<int32, int32, int32, UMeshEdge*> MeshEdge : _Edges)
+		for (TPair<int32, TTuple<int32, int32, UMeshEdge*>>& MeshEdge : MeshEdges)
 		{
-			int32  V0Index = MeshEdge.Get<1>();
-			int32  V1Index = MeshEdge.Get<2>();
+			int32  V0Index = MeshEdge.Value.Get<0>();
+			int32  V1Index = MeshEdge.Value.Get<1>();
 			if((V0Index == V0 && V1Index == V1))
 			{
-				MeshEdge.Get<3>()->RemoveTriangle(MeshTri);
+				MeshEdge.Value.Get<2>()->RemoveTriangle(MeshTri);
 				return;
 			}
 		}
@@ -410,17 +411,17 @@ void UPrimitiveMeshComponent::RemoveTriangleFromEdge(int32 V0, int32 V1, UMeshTr
 
 UMeshTriangle* UPrimitiveMeshComponent::CreateNewTriangle(int32 V0Index, int32 V1Index, int32 V2Index)
 {
-	if((V0Index < 0 || V0Index >= _Vertices.Num())) return NewObject<UMeshTriangle>();
-	if((V1Index < 0 || V1Index >= _Vertices.Num())) return NewObject<UMeshTriangle>();
-	if((V2Index < 0 || V2Index >= _Vertices.Num())) return NewObject<UMeshTriangle>();
+	if((V0Index < 0 || V0Index >= MeshVertices.Num())) return NewObject<UMeshTriangle>();
+	if((V1Index < 0 || V1Index >= MeshVertices.Num())) return NewObject<UMeshTriangle>();
+	if((V2Index < 0 || V2Index >= MeshVertices.Num())) return NewObject<UMeshTriangle>();
 
 	UMeshTriangle* MeshTriangle= NewObject<UMeshTriangle>();
 	MeshTriangle->Initializer(V0Index, V1Index, V2Index);
 	SetTriangle(MeshTriangle);
 	
-	_Vertices[V0Index]->SetTriangle(MeshTriangle);
-	_Vertices[V1Index]->SetTriangle(MeshTriangle);
-	_Vertices[V2Index]->SetTriangle(MeshTriangle);
+	MeshVertices[V0Index]->SetTriangle(MeshTriangle);
+	MeshVertices[V1Index]->SetTriangle(MeshTriangle);
+	MeshVertices[V2Index]->SetTriangle(MeshTriangle);
 	
 	UProcedureMeshVertexPair* Pair1 = NewObject<UProcedureMeshVertexPair>();
 	Pair1->Initializer(V0Index, V1Index);
@@ -439,9 +440,10 @@ void UPrimitiveMeshComponent::AddTriangleToEdge(UProcedureMeshVertexPair* MeshVe
 {
 	bool IsExist = false;
 	
-	for (TTuple<int32, int32, int32, UMeshEdge*> MeshEdge : _Edges)
+	for (TPair<int32, TTuple<int32, int32, UMeshEdge*>>& MeshEdge : MeshEdges)
 	{
-		if(MeshVertexPair->Vertex0Index == MeshEdge.Get<1>() && MeshVertexPair->Vertex1Index == MeshEdge.Get<2>())
+		
+		if(MeshVertexPair->Vertex0Index == MeshEdge.Value.Get<0>() && MeshVertexPair->Vertex1Index == MeshEdge.Value.Get<1>())
 		{
 			IsExist = true;
 			break;
@@ -450,22 +452,22 @@ void UPrimitiveMeshComponent::AddTriangleToEdge(UProcedureMeshVertexPair* MeshVe
 
 	if(IsExist == false)
 	{
-		UMeshEdge* MeshEdge = NewObject<UMeshEdge>();
-		MeshEdge->Initializer(MeshVertexPair->Vertex0Index, MeshVertexPair->Vertex1Index);
-		MeshEdge->SetTriangle(MeshTriangle);
-		SetEdges(MakeTuple(_Edges.Num(), MeshVertexPair->Vertex0Index, MeshVertexPair->Vertex1Index, MeshEdge));
+		UMeshEdge* Edge = NewObject<UMeshEdge>();
+		Edge->Initializer(MeshVertexPair->Vertex0Index, MeshVertexPair->Vertex1Index);
+		Edge->SetTriangle(MeshTriangle);
+		SetEdges(MeshEdges.Num(), MakeTuple(MeshVertexPair->Vertex0Index, MeshVertexPair->Vertex1Index, Edge));
 	}
 }
 
 void UPrimitiveMeshComponent::RemoveUnusedEdges()
 {
-	for(auto i = _Edges.Num() - 1; i >= 0; i--)
+	for(auto i = MeshEdges.Num() - 1; i >= 0; i--)
 	{
-		int j = _Edges[i].Get<3>()->GetTriangles().Num();
+		int j = MeshEdges[i].Get<2>()->GetTriangles().Num();
 		if(j == 0)
 		{
-			_Edges.RemoveAt(i);
-			_Edges[i].Get<3>()->Dispose();
+			MeshEdges.Remove(i);
+			MeshEdges[i].Get<2>()->Dispose();
 		}
 	}
 }

@@ -26,7 +26,7 @@ void UMeshVertex::Initializer(const int& Index, const FVector& CurrPos, const FV
 
 TArray<UMeshTriangle*> UMeshVertex::GetTriangles() const
 {
-	return _Triangles;
+	return MeshTriangles;
 }
 
 TArray<UMeshEdge*> UMeshVertex::GetEdgeFromTriangle()
@@ -48,7 +48,7 @@ TArray<UMeshEdge*> UMeshVertex::GetEdgeFromTriangle()
 
 void UMeshVertex::SetTriangle(UMeshTriangle* MeshTriangle)
 {
-	_Triangles.Add(MeshTriangle);
+	MeshTriangles.Add(MeshTriangle);
 }
 
 void UMeshVertex::BeginPlay()

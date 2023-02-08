@@ -27,11 +27,11 @@ TArray<UMeshEdge*> UMeshTriangle::GetEdgeFromTriangle()
 	UMeshEdge* Edges1;
 	UMeshEdge* Edges2;
 	
-	for (TTuple<int32, int32, int32, UMeshEdge*> EdgesData : GetEdges())
+	for (TPair<int32, TTuple<int32, int32, UMeshEdge*>>& MeshEdge : GetEdges())
 	{
-		if(EdgesData.Get<1>() == Vertex0Index && EdgesData.Get<2>() == Vertex1Index) { Edges0 = EdgesData.Get<3>(); }
-		if(EdgesData.Get<1>() == Vertex1Index && EdgesData.Get<2>() == Vertex2Index) { Edges1 = EdgesData.Get<3>(); }
-		if(EdgesData.Get<1>() == Vertex2Index && EdgesData.Get<2>() == Vertex0Index) { Edges2 = EdgesData.Get<3>(); }
+		if(MeshEdge.Value.Get<0>() == Vertex0Index && MeshEdge.Value.Get<1>() == Vertex1Index) { Edges0 = MeshEdge.Value.Get<2>(); }
+		if(MeshEdge.Value.Get<0>() == Vertex1Index && MeshEdge.Value.Get<1>() == Vertex2Index) { Edges1 = MeshEdge.Value.Get<2>(); }
+		if(MeshEdge.Value.Get<0>() == Vertex2Index && MeshEdge.Value.Get<1>() == Vertex0Index) { Edges2 = MeshEdge.Value.Get<2>(); }
 	}
 	Edges.Add(Edges0);
 	Edges.Add(Edges1);
@@ -59,11 +59,11 @@ void UMeshTriangle::ShuffleVertexIndices(const int& V0Index, const int& V1Index)
 
 void UMeshTriangle::Dispose()
 {
-	if(_IsDisposed == false)
+	if(IsDisposed == false)
 	{
 		SetMesh(nullptr);
 	}
-	_IsDisposed = true;
+	IsDisposed = true;
 }
 
 void UMeshTriangle::BeginPlay()

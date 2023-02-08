@@ -52,6 +52,6 @@ public:
 	
 private:
 	/* Attributes */
-	TArray<UMeshTriangle*> _Triangles;
-	bool _IsDisposed = false;		
+	TArray<UMeshTriangle*> MeshTriangles;
+	bool IsDisposed = false;		
 };
