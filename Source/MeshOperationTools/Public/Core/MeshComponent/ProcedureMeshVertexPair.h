@@ -30,11 +30,11 @@ public:
 	
 public:
 	/* Attributes */
-	int Vertex0Index;
-	int Vertex1Index;
+	int32 Vertex0Index;
+	int32 Vertex1Index;
 	
 	/* Initialization */
-	void Initializer(const int& V0, const int& V1)
+	void Initializer(const int32& V0, const int32& V1)
 	{
 		Vertex0Index = V0;
 		Vertex1Index = V1;

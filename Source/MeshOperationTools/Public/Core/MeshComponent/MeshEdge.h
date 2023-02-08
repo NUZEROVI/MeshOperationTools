@@ -32,13 +32,13 @@ public:
 public:
 	/* Attributes */
 	bool IsNull;
-	int Vertex0Index;
-	int Vertex1Index;
+	int32 Vertex0Index;
+	int32 Vertex1Index;
 	bool OriginalEdge;
 	bool operator == (const UMeshEdge &b) const { return Vertex0Index == b.Vertex0Index && Vertex1Index == b.Vertex1Index; }
 
 	/* Initialization */
-	void Initializer(const int& V0, const int& V1);
+	void Initializer(const int32& V0, const int32& V1);
 	
 	/* Getters */
 	virtual TArray<UMeshTriangle*> GetTriangles() const override;

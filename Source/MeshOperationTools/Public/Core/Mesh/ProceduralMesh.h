@@ -38,7 +38,7 @@ public:
 	UStaticMesh* Mesh;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="MeshData") 
-	TArray<int> Indices; // Triangles Index
+	TArray<int32> Indices; // Triangles Index
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="MeshData") 
 	TArray<FVector> Vertices; // Between 0 and 1 (Normalize)
@@ -54,9 +54,9 @@ public:
 	TArray<FVector> NewVertices;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="MeshUpdated") 
-	TArray<int> NewIndices;
+	TArray<int32> NewIndices;
 	
-	void UpdateNewMeshArrays(TArray<FVector> NewMeshVertices, TArray<FVector2D> NewMeshUVs, TArray<int> NewMeshTriangles);
+	void UpdateNewMeshArrays(TArray<FVector> NewMeshVertices, TArray<FVector2D> NewMeshUVs, TArray<int32> NewMeshTriangles);
 
 
 private:

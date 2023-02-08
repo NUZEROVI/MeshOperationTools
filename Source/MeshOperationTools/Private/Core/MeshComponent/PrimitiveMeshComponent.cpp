@@ -29,7 +29,7 @@ void UPrimitiveMeshComponent::TickComponent(float DeltaTime, ELevelTick TickType
 
 }
 
-void UPrimitiveMeshComponent::InitializedVertices(AProceduralMesh* Mesh, const int& Index, const FVector& CurrPos, const FVector& OriPos, const FVector2D& MeshUVs)
+void UPrimitiveMeshComponent::InitializedVertices(AProceduralMesh* Mesh, const int32& Index, const FVector& CurrPos, const FVector& OriPos, const FVector2D& MeshUVs)
 {
 	ProceduralMesh = Mesh;
 	UMeshVertex* MeshVertex = NewObject<UMeshVertex>();
@@ -37,7 +37,7 @@ void UPrimitiveMeshComponent::InitializedVertices(AProceduralMesh* Mesh, const i
 	SetVertices(MeshVertex);
 }
 
-UMeshTriangle* UPrimitiveMeshComponent::InitializedTriangle(int V0Index, int V1Index, int V2Index)
+UMeshTriangle* UPrimitiveMeshComponent::InitializedTriangle(int32 V0Index, int32 V1Index, int32 V2Index)
 {
 	if((V0Index < 0 || V0Index >= MeshVertices.Num())) return NewObject<UMeshTriangle>();
 	if((V1Index < 0 || V1Index >= MeshVertices.Num())) return NewObject<UMeshTriangle>();
@@ -328,7 +328,7 @@ UMeshVertex* UPrimitiveMeshComponent::CreateVertexInTriangle(UMeshTriangle* Mesh
 	UMeshVertex* V1 = MeshVertices[MeshTri->Vertex1Index];
 	UMeshVertex* V2 = MeshVertices[MeshTri->Vertex2Index];
 
-	int NewVertexIndex = MeshVertices.Num();
+	int32 NewVertexIndex = MeshVertices.Num();
 	UMeshVertex* MeshVertex = NewObject<UMeshVertex>();
 	MeshVertex->Initializer(
 				NewVertexIndex,
@@ -461,9 +461,9 @@ void UPrimitiveMeshComponent::AddTriangleToEdge(UProcedureMeshVertexPair* MeshVe
 
 void UPrimitiveMeshComponent::RemoveUnusedEdges()
 {
-	for(int i = MeshEdges.Num() - 1; i >= 0; i--)
+	for(int32 i = MeshEdges.Num() - 1; i >= 0; i--)
 	{
-		int j = MeshEdges[i].Get<2>()->GetTriangles().Num();
+		int32 j = MeshEdges[i].Get<2>()->GetTriangles().Num();
 		if(j == 0)
 		{
 			MeshEdges.Remove(i);

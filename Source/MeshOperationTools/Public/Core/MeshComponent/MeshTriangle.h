@@ -31,19 +31,19 @@ public:
 public:
 	/* Attributes */
 	bool IsNull;
-	int Vertex0Index;
-	int Vertex1Index;
-	int Vertex2Index;
+	int32 Vertex0Index;
+	int32 Vertex1Index;
+	int32 Vertex2Index;
 	bool operator == (const UMeshTriangle &b) const { return Vertex0Index == b.Vertex0Index && Vertex1Index == b.Vertex1Index &&	Vertex2Index == b.Vertex2Index;	}
 
 	/* Initialization */
-	void Initializer(const int& V0Index, const int& V1Index, const int& V2Index);
+	void Initializer(const int32& V0Index, const int32& V1Index, const int32& V2Index);
 	
 	/* Getters */
 	TArray<UMeshEdge*> GetEdgeFromTriangle();
 	
 	/* Setters */
-	void ShuffleVertexIndices(const int& V0Index, const int& V1Index);
+	void ShuffleVertexIndices(const int32& V0Index, const int32& V1Index);
 	void Dispose();
 
 private:

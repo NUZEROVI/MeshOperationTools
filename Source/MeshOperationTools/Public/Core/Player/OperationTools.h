@@ -43,7 +43,7 @@ public:
 	FVector2D OriCursorPos;
 	
 	// RuntimeMesh Return Value (Initialized)
-	int DragVertexIndex = -1; 
+	int32 DragVertexIndex = -1; 
 	bool IsOriVertices = false;
 	
 	/* Operation Methods */

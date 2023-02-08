@@ -110,7 +110,7 @@ void AOperationTools::Tick(float DeltaTime)
 	
 	TArray<FVector> Vertices;
 	TArray<FVector2D> UVs;
-	TArray<int> Triangles;
+	TArray<int32> Triangles;
 
 	if(IsDrag)
 	{
@@ -145,7 +145,7 @@ void AOperationTools::Tick(float DeltaTime)
 				UVs.Init(FVector2D(), PrimitiveMeshComponent->GetVertices().Num());
 			}
 			
-			for(int i = 0; i < PrimitiveMeshComponent->GetVertices().Num(); ++i)
+			for(int32 i = 0; i < PrimitiveMeshComponent->GetVertices().Num(); ++i)
 			{
 				if(PrimitiveMeshComponent->GetVertices()[i]->IsNull) continue;
 				if(i == PrimitiveMeshComponent->GetDragVertexIndex() && (PrimitiveMeshComponent->GetIsOriVertices() == false || IsMove == true)) // Drag Vertex
@@ -163,7 +163,7 @@ void AOperationTools::Tick(float DeltaTime)
 			}
 	
 			Triangles.Init(int32(), PrimitiveMeshComponent->GetTriangles().Num() * 3);
-			for(int j = 0; j < PrimitiveMeshComponent->GetTriangles().Num(); ++j)
+			for(int32 j = 0; j < PrimitiveMeshComponent->GetTriangles().Num(); ++j)
 			{
 				Triangles[3 * j + 0] = PrimitiveMeshComponent->GetTriangles()[j]->Vertex0Index;;
 				Triangles[3 * j + 1] = PrimitiveMeshComponent->GetTriangles()[j]->Vertex1Index;

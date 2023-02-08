@@ -31,14 +31,14 @@ public:
 public:	
 	/* Attributes */
 	bool IsNull;
-	int VertexIndex;
+	int32 VertexIndex;
 	FVector CurrentPosition;
 	FVector OriginalPosition;
 	FVector2D UVs;
 	bool operator == (const UMeshVertex &V) const {	return CurrentPosition == V.CurrentPosition && OriginalPosition == V.OriginalPosition;	}
 	
 	/* Initialization */
-	void Initializer(const int& Index, const FVector& CurrPos, const FVector& OriPos, const FVector2D& MeshUVs);
+	void Initializer(const int32& Index, const FVector& CurrPos, const FVector& OriPos, const FVector2D& MeshUVs);
 
 	/* Getters */
 	virtual TArray<UMeshTriangle*> GetTriangles() const override;

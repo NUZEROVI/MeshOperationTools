@@ -38,10 +38,10 @@ public:
 public:
 	// To Initialize the Mesh.
 	UFUNCTION(BlueprintCallable, Category = "Mesh Initialized")
-	void InitializedVertices(AProceduralMesh* Mesh, const int& Index, const FVector& CurrPos, const FVector& OriPos, const FVector2D& MeshUVs);
+	void InitializedVertices(AProceduralMesh* Mesh, const int32& Index, const FVector& CurrPos, const FVector& OriPos, const FVector2D& MeshUVs);
 	
 	UFUNCTION(BlueprintCallable, Category = "Mesh Initialized")
-	UMeshTriangle* InitializedTriangle(int V0Index, int V1Index, int V2Index);
+	UMeshTriangle* InitializedTriangle(int32 V0Index, int32 V1Index, int32 V2Index);
 	
 	UFUNCTION(BlueprintCallable, Category = "Mesh Initialized")
 	void AddTriangleToEdge(AProceduralMesh* Mesh, UProcedureMeshVertexPair* MeshVertexPair, UMeshTriangle* MeshTriangle);
@@ -93,9 +93,9 @@ public:
 	UMeshVertex* CreateVertexInTriangle(UMeshTriangle* MeshTri, float U, float V);
 
 	// To Set Runtime Mesh return value
-	int DragVertexIndex = -1; 
+	int32 DragVertexIndex = -1; 
 	bool IsOriVertices = false;
-	int GetDragVertexIndex(){ return DragVertexIndex; }
+	int32 GetDragVertexIndex(){ return DragVertexIndex; }
 	bool GetIsOriVertices() { return IsOriVertices; }
 	
 // Attributes
@@ -108,11 +108,9 @@ private:
 	TArray<UMeshVertex*> MeshVertices;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 	TArray<UMeshTriangle*> MeshTriangles;
-
-	// TTuple<int32, int32, UMeshEdge*> Edge;
+	
 	TMap<int32, TTuple<int32, int32, UMeshEdge*>> MeshEdges;
-	//TArray<TTuple<int32, int32, int32, UMeshEdge*>> _Edges;
-
+	
 	/* Methods */
 	void RemoveMeshTriangle(UMeshTriangle* MeshTri);
 	void RemoveTriangleFromEdge(int32 V0, int32 V1, UMeshTriangle* MeshTri);

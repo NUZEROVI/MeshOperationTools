@@ -12,7 +12,7 @@ UMeshTriangle::UMeshTriangle()
 	IsNull = true;
 }
 
-void UMeshTriangle::Initializer(const int& V0Index, const int& V1Index, const int& V2Index)
+void UMeshTriangle::Initializer(const int32& V0Index, const int32& V1Index, const int32& V2Index)
 {
 	Vertex0Index = V0Index;
 	Vertex1Index = V1Index;
@@ -39,7 +39,7 @@ TArray<UMeshEdge*> UMeshTriangle::GetEdgeFromTriangle()
 	return Edges;
 }
 
-void UMeshTriangle::ShuffleVertexIndices(const int& V0Index, const int& V1Index)
+void UMeshTriangle::ShuffleVertexIndices(const int32& V0Index, const int32& V1Index)
 {
 	if(Vertex1Index == V0Index && Vertex2Index == V1Index)
 	{

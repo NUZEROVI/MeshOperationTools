@@ -75,7 +75,7 @@ void AProceduralMesh::LoadMeshVertices()
 	
 	Vertices.AddUninitialized(Resource.VertexBuffers.PositionVertexBuffer.GetNumVertices());
 	VertexColors.AddUninitialized(Vertices.Num());
-	for(int i = 0; i < Vertices.Num(); i++)
+	for(int32 i = 0; i < Vertices.Num(); i++)
 	{
 		// Original Mesh Vertices
 		Vertices[i] = Resource.VertexBuffers.PositionVertexBuffer.VertexPosition(i);
@@ -85,7 +85,7 @@ void AProceduralMesh::LoadMeshVertices()
 	}
 	
 	// Initialized UMeshTriangle and MeshEdges InitializedTriangle()
-	for(int i = 0; i < Indices.Num(); i += 3) { PrimitiveMeshComponent->InitializedTriangle(Indices[i], Indices[i + 1], Indices[i + 2]);	}
+	for(int32 i = 0; i < Indices.Num(); i += 3) { PrimitiveMeshComponent->InitializedTriangle(Indices[i], Indices[i + 1], Indices[i + 2]);	}
 	
 	// Set OriginalEdge
 	for (TPair<int32, TTuple<int32, int32, UMeshEdge*>>& MeshEdge : PrimitiveMeshComponent->GetEdges()) { MeshEdge.Value.Get<2>()->SetOriEdge(true); }
@@ -103,7 +103,7 @@ void AProceduralMesh::LoadMeshVertices()
 	ProceduralMesh->ContainsPhysicsTriMeshData(true);
 }
 
-void AProceduralMesh::UpdateNewMeshArrays(TArray<FVector> NewMeshVertices, TArray<FVector2D> NewMeshUVs, TArray<int> NewMeshTriangles)
+void AProceduralMesh::UpdateNewMeshArrays(TArray<FVector> NewMeshVertices, TArray<FVector2D> NewMeshUVs, TArray<int32> NewMeshTriangles)
 {
 	NewVertices = NewMeshVertices;
 	NewIndices = NewMeshTriangles;
@@ -113,7 +113,7 @@ void AProceduralMesh::UpdateNewMeshArrays(TArray<FVector> NewMeshVertices, TArra
 	TArray<FLinearColor> VertexColors;
 
 	VertexColors.AddUninitialized(NewVertices.Num());
-	for (int i = 0; i < NewIndices.Num(); i += 3)
+	for (int32 i = 0; i < NewIndices.Num(); i += 3)
 	{
 		VertexColors[NewIndices[i]] = FLinearColor::Gray;
 		VertexColors[NewIndices[i + 1]] = FLinearColor::Gray;

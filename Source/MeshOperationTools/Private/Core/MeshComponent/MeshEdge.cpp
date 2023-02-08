@@ -14,7 +14,7 @@ UMeshEdge::UMeshEdge()
 	IsNull = true;
 }
 
-void UMeshEdge::Initializer(const int& V0, const int& V1)
+void UMeshEdge::Initializer(const int32& V0, const int32& V1)
 {
 	Vertex0Index = V0;
 	Vertex1Index = V1;
