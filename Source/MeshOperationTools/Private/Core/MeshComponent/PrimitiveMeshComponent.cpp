@@ -461,7 +461,7 @@ void UPrimitiveMeshComponent::AddTriangleToEdge(UProcedureMeshVertexPair* MeshVe
 
 void UPrimitiveMeshComponent::RemoveUnusedEdges()
 {
-	for(auto i = MeshEdges.Num() - 1; i >= 0; i--)
+	for(int i = MeshEdges.Num() - 1; i >= 0; i--)
 	{
 		int j = MeshEdges[i].Get<2>()->GetTriangles().Num();
 		if(j == 0)
